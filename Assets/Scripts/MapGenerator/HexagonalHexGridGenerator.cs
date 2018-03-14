@@ -40,7 +40,7 @@ class HexagonalHexGridGenerator : ICellGridGenerator
                 GameObject hexagon2 = Instantiate(HexagonPrefab);
 				hexagon2.transform.SetParent(CellsParent,true);
 				hexagon2.transform.localPosition = new Vector3((-i * hexSize.x * 0.75f), 0, (i * hexSize.z * 0.5f) + (j * hexSize.z));
-				hexagon2.GetComponent<HexCell>().OffsetCoord = new Vector2(-i, Radius - j - 1 - (i/2));
+                hexagon2.GetComponent<HexCell>().OffsetCoord = new Vector2(-i, Radius - j - 1 - (i/2));
                 hexagon2.GetComponent<HexCell>().MovementCost = 1;
 				hexagon2.name = "dige(" + HexCell.GetComponent<HexCell>().OffsetCoord.x + "," + HexCell.GetComponent<HexCell>().OffsetCoord.y+")";
                 hexagons.Add(hexagon2.GetComponent<HexCell>());
