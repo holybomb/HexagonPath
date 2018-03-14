@@ -10,6 +10,7 @@ public class HexCell : MonoBehaviour,IGraphNode
     public bool isSelected = false;
     [HideInInspector]
     public Vector2 OffsetCoord;
+	public long SingleOffset { get { return (((long)OffsetCoord.x) << 32) | (long)((uint)(int)OffsetCoord.y); } }
     /// <summary>
     /// HexGrids comes in four types regarding the layout. This distinction is necessary to convert cube coordinates to offset and vice versa.
     /// </summary>
