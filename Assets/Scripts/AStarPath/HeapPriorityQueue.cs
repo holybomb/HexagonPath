@@ -37,7 +37,7 @@ class HeapPriorityQueue
     /// </summary>
     /// <param name="item">Item.</param>
     /// <param name="priority">Priority.</param>
-    public void Enqueue(HexCell item, int priority)
+    public void Enqueue(HexCell item, float priority)
     {
         _queue.Add(new PriorityQueueNode(item, priority));
         int ci = _queue.Count - 1;

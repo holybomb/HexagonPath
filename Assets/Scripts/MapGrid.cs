@@ -129,6 +129,7 @@ public class MapGrid : MonoBehaviour
             isUpdatePath = false;
         }
     }
+    bool isDrawLineThroughCenter = true;
 	LineRenderer lineRenderer;
 	private void DrawPath()
 	{
@@ -139,12 +140,15 @@ public class MapGrid : MonoBehaviour
             #else
 			lineRenderer.positionCount=LengthOfLineRenderer;
             #endif
-			int index = LengthOfLineRenderer;
-			path.ForEach (p => {
-				lineRenderer.SetPosition(--index, p.transform.position+new Vector3(0.0f,0.5f,0.0f));  
-			});
-			lineRenderer.SetPosition(--index, startCell.transform.position+new Vector3(0.0f,0.5f,0.0f));  
-
+            if (isDrawLineThroughCenter)
+            {
+                int index = LengthOfLineRenderer;
+                path.ForEach(p =>
+                    {
+                        lineRenderer.SetPosition(--index, p.transform.position + new Vector3(0.0f, 0.5f, 0.0f));  
+                    });
+                lineRenderer.SetPosition(--index, startCell.transform.position + new Vector3(0.0f, 0.5f, 0.0f));  
+            }
 		}
 	}
 }

@@ -17,7 +17,7 @@ public class AStarPathfinding
         //记录到某个临时目标的路程花费
         Dictionary<HexCell, int> costSoFar = new Dictionary<HexCell, int>();
         costSoFar.Add(originNode, 0);
-
+        var midNode = new Vector2(Mathf.Abs(destinationNode.OffsetCoord.x - originNode.OffsetCoord.x) / 2, Mathf.Abs(destinationNode.OffsetCoord.y - originNode.OffsetCoord.y) / 2);
         while (frontier.Count != 0)
         {
             var current = frontier.Dequeue();
@@ -25,6 +25,7 @@ public class AStarPathfinding
             if (current.Equals(destinationNode)) break;
 
             var neighbours = GetNeigbours(edges, current);
+//            neighbours = neighbours.OrderBy(c => c.GetDistance(destinationNode)).ToList();
             if (neighbours.Contains(destinationNode))
                 neighbours.RemoveAll(c => c != destinationNode);
             foreach (var neighbour in neighbours)
@@ -36,8 +37,8 @@ public class AStarPathfinding
                     costSoFar[neighbour] = newCost;
                     cameFrom[neighbour] = current;
                     //根据到目标点的坐标距离设置启发值
-                    var heuristic = Heuristic(destinationNode, neighbour);
-                    var priority = newCost + heuristic;
+                    var heuristicDes = Heuristic(destinationNode, neighbour);
+                    var priority = newCost + heuristicDes;// + Vector2.Distance(neighbour.OffsetCoord, midNode);
                     //将此邻居节点压入目标路径队列
                     frontier.Enqueue(neighbour, priority);
                 }
