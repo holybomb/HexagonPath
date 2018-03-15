@@ -46,6 +46,7 @@ public class MapGrid : MonoBehaviour
                 });
         }
 		var lineObject = new GameObject ();
+		lineObject.transform.SetParent (cellRoot.transform);
 		lineRenderer = lineObject.AddComponent<LineRenderer>();  
 		//设置材质  
 		lineRenderer.material = new Material(Shader.Find("Mobile/Particles/Alpha Blended"));  
@@ -156,15 +157,12 @@ public class MapGrid : MonoBehaviour
                 {
 					var p = path[LengthOfLineRenderer-i-1];
                     float lerpDt = (float)(i) / (LengthOfLineRenderer-1);
+					#if UNITY_5
+					lineRenderer.numPositions++;
+					#else
 					lineRenderer.positionCount++;
+					#endif
                     var pos = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
-//                    var info = "Start Check:"+pos;
-//                    path.ForEach(c =>
-//                        {
-//                            var dis = Vector3.Distance(pos,c.transform.position);
-//                            info +=("To "+c.CubeCoord+" dis:"+dis +"\n");
-//                        });
-//                    Debug.Log(info);
                     if (Vector3.Distance(pos, p.transform.position) > 0.25)
                     {
                         for (float t = 0; t < 1.0f; t += 0.1f)
@@ -178,8 +176,7 @@ public class MapGrid : MonoBehaviour
                         }
                     }
 					lineRenderer.SetPosition(i, pos - new Vector3(0.0f, 0.5f, 0.0f));
-//                    p.y = 0;
-//                    yield return new WaitForSeconds(0.3f);
+
                 }
             }
 		}
