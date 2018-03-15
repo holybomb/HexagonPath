@@ -47,8 +47,8 @@ public class HexagonalHexGridGenerator:MonoBehaviour
             if (textNode && hexCell)
             {
                 var text = textNode.GetComponent<TextMesh>();
-//                text.text = hexCell.CubeCoord.x + ",\n" + hexCell.CubeCoord.y + "," + hexCell.CubeCoord.z;
-                text.text = hexCell.OffsetCoord.ToString("0,0");
+                text.text = hexCell.CubeCoord.x + ",\n" + hexCell.CubeCoord.y + "," + hexCell.CubeCoord.z;
+//                text.text = hexCell.OffsetCoord.ToString("0,0");
             }
         }
     }

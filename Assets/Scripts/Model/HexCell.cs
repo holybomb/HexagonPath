@@ -14,7 +14,6 @@ public class HexCell : MonoBehaviour
     /// <summary>
     /// HexGrids comes in four types regarding the layout. This distinction is necessary to convert cube coordinates to offset and vice versa.
     /// </summary>
-
 	private bool _IsCubeCoordInit;
 	private Vector3 _CubeCoord;
 

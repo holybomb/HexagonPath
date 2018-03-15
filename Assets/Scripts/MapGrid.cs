@@ -124,24 +124,24 @@ public class MapGrid : MonoBehaviour
                                         c.MarkAsPath();
                                 });
                         }
-                        DrawPath();
+                    StartCoroutine(DrawPath());
                     })));
             isUpdatePath = false;
         }
     }
     bool isDrawLineThroughCenter = false;
 	LineRenderer lineRenderer;
-	private void DrawPath()
+    private IEnumerator DrawPath()
 	{
 		if (lineRenderer && path != null) {
 			int LengthOfLineRenderer = path.Count+1;
-            #if UNITY_5
-            lineRenderer.numPositions = LengthOfLineRenderer;
-            #else
-			lineRenderer.positionCount=LengthOfLineRenderer;
-            #endif
             if (isDrawLineThroughCenter)
             {
+                #if UNITY_5
+                lineRenderer.numPositions = LengthOfLineRenderer;
+                #else
+                lineRenderer.positionCount=LengthOfLineRenderer;
+                #endif
                 int index = LengthOfLineRenderer;
                 path.ForEach(p =>
                     {
@@ -154,14 +154,36 @@ public class MapGrid : MonoBehaviour
                 path.Add(startCell);
                 for (int i = 0; i < LengthOfLineRenderer; i++)
                 {
-                    var p = path[i];
-//                    float lerpDt = (float)(i) / LengthOfLineRenderer;
-//                    var p = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
+//                    var p = path[i];
+                    float lerpDt = (float)(i) / (LengthOfLineRenderer-1);
+                    var pos = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
+                    var info = "Start Check:"+pos;
+                    path.ForEach(c =>
+                        {
+                            var dis = Vector3.Distance(pos,c.transform.position);
+                            info +=("To "+c.CubeCoord+" dis:"+dis +"\n");
+                        });
+                    Debug.Log(info);
+//                    if (Vector3.Distance(pos, p.transform.position) > 1)
+//                    {
+//                        for (float t = 0; t < 1.0f; t += 0.01f)
+//                        {
+//                            var temp = Vector3.Lerp(pos, p.transform.position, t);
+//                            if (Vector3.Distance(temp, p.transform.position) <= 1)
+//                            {
+//                                pos = temp;
+//                                break;
+//                            }
+//                        }
+//                    }
 //                    p.y = 0;
-                    lineRenderer.SetPosition(i, p.transform.position - new Vector3(0.0f, 0.5f, 0.0f));
+                    lineRenderer.numPositions++;
+                    lineRenderer.SetPosition(i, pos - new Vector3(0.0f, 0.5f, 0.0f));
+//                    yield return new WaitForSeconds(0.3f);
                 }
             }
 		}
+        yield return 0;
 	}
 }
 
