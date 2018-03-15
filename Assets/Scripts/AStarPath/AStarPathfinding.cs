@@ -17,15 +17,17 @@ public class AStarPathfinding
         //记录到某个临时目标的路程花费
         Dictionary<HexCell, int> costSoFar = new Dictionary<HexCell, int>();
         costSoFar.Add(originNode, 0);
-        var midNode = new Vector2(Mathf.Abs(destinationNode.OffsetCoord.x - originNode.OffsetCoord.x) / 2, Mathf.Abs(destinationNode.OffsetCoord.y - originNode.OffsetCoord.y) / 2);
+        var midDis = originNode.GetDistance(destinationNode) / 2;
         while (frontier.Count != 0)
         {
             var current = frontier.Dequeue();
-            //寻路到目标点跳出
-            if (current.Equals(destinationNode)) break;
-
+//            //寻路到目标点跳出
+//            if (current.Equals(destinationNode))
+//            {
+//                break;
+//            }
             var neighbours = GetNeigbours(edges, current);
-//            neighbours = neighbours.OrderBy(c => c.GetDistance(destinationNode)).ToList();
+            neighbours = neighbours.OrderBy(c => c.GetDistance(destinationNode)).ToList();
             if (neighbours.Contains(destinationNode))
                 neighbours.RemoveAll(c => c != destinationNode);
             foreach (var neighbour in neighbours)
@@ -38,7 +40,8 @@ public class AStarPathfinding
                     cameFrom[neighbour] = current;
                     //根据到目标点的坐标距离设置启发值
                     var heuristicDes = Heuristic(destinationNode, neighbour);
-                    var priority = newCost + heuristicDes;// + Vector2.Distance(neighbour.OffsetCoord, midNode);
+                    var heuristicOrg = Heuristic(neighbour,originNode);
+                    var priority = newCost + heuristicDes;// + (heuristicOrg - midDis);
                     //将此邻居节点压入目标路径队列
                     frontier.Enqueue(neighbour, priority);
                 }
@@ -54,6 +57,16 @@ public class AStarPathfinding
                 findPathCallBack.Invoke(path);
             }
             yield break;
+        }
+        var frontCells = frontier.getQueueCell();
+        foreach (var cell in frontCells)
+        {
+            cell.SetColor(Color.red);
+            yield return new WaitForSeconds(0.5f);
+        }
+        foreach (var cell in frontCells)
+        {
+            cell.UnMark();
         }
         path.Add(destinationNode);
         var temp = destinationNode;

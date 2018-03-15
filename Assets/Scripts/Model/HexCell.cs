@@ -21,7 +21,6 @@ public class HexCell : MonoBehaviour
     public int MovementCost;
 
     public event EventHandler CellClicked;
-//    public event EventHandler CellUp;
 
     /// <summary>
     /// 立方体坐标
@@ -135,10 +134,5 @@ public class HexCell : MonoBehaviour
         {
             CellClicked.Invoke(this, null);
         }
-    }
-
-    public void OnMouseUp()
-    {
-
     }
 }

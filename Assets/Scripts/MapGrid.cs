@@ -129,7 +129,7 @@ public class MapGrid : MonoBehaviour
             isUpdatePath = false;
         }
     }
-    bool isDrawLineThroughCenter = true;
+    bool isDrawLineThroughCenter = false;
 	LineRenderer lineRenderer;
 	private void DrawPath()
 	{
@@ -148,6 +148,18 @@ public class MapGrid : MonoBehaviour
                         lineRenderer.SetPosition(--index, p.transform.position + new Vector3(0.0f, 0.5f, 0.0f));  
                     });
                 lineRenderer.SetPosition(--index, startCell.transform.position + new Vector3(0.0f, 0.5f, 0.0f));  
+            }
+            else
+            {
+                path.Add(startCell);
+                for (int i = 0; i < LengthOfLineRenderer; i++)
+                {
+                    var p = path[i];
+//                    float lerpDt = (float)(i) / LengthOfLineRenderer;
+//                    var p = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
+//                    p.y = 0;
+                    lineRenderer.SetPosition(i, p.transform.position - new Vector3(0.0f, 0.5f, 0.0f));
+                }
             }
 		}
 	}
