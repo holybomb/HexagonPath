@@ -1,119 +1,84 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
+using UnityEngine;
 
-/// <summary>
-/// Implementation of A* pathfinding algorithm.
-/// </summary>
-class AStarPathfinding : IPathfinding
+public class AStarPathfinding
 {
-	public static Dictionary<long, Dictionary<long, int>> Distances;
-
-    public override List<T> FindPath<T>(Dictionary<T, Dictionary<T, int>> edges, T originNode, T destinationNode)
+    public delegate void FindPathCallBack(List<HexCell> path);
+    public IEnumerator FindPath(Dictionary<HexCell, Dictionary<HexCell, int>> edges, HexCell originNode, HexCell destinationNode,FindPathCallBack findPathCallBack=null)
     {
-        IPriorityQueue<T> frontier = new HeapPriorityQueue<T>();
+        //记录一个目标路径队列
+        var frontier = new HeapPriorityQueue();
         frontier.Enqueue(originNode, 0);
-
-        Dictionary<T, T> cameFrom = new Dictionary<T, T>();
-        cameFrom.Add(originNode, default(T));
-        Dictionary<T, int> costSoFar = new Dictionary<T, int>();
+        //记录路径图
+        Dictionary<HexCell, HexCell> cameFrom = new Dictionary<HexCell, HexCell>();
+        cameFrom.Add(originNode, default(HexCell));
+        //记录到某个临时目标的路程花费
+        Dictionary<HexCell, int> costSoFar = new Dictionary<HexCell, int>();
         costSoFar.Add(originNode, 0);
 
         while (frontier.Count != 0)
         {
             var current = frontier.Dequeue();
+            //寻路到目标点跳出
             if (current.Equals(destinationNode)) break;
 
             var neighbours = GetNeigbours(edges, current);
+            if (neighbours.Contains(destinationNode))
+                neighbours.RemoveAll(c => c != destinationNode);
             foreach (var neighbour in neighbours)
             {
                 var newCost = costSoFar[current] + edges[current][neighbour];
                 if (!costSoFar.ContainsKey(neighbour) || newCost < costSoFar[neighbour])
                 {
+                    //找到一个更近的邻居节点
                     costSoFar[neighbour] = newCost;
                     cameFrom[neighbour] = current;
-                    var priority = newCost + Heuristic(destinationNode, neighbour);
+                    //根据到目标点的坐标距离设置启发值
+                    var heuristic = Heuristic(destinationNode, neighbour);
+                    var priority = newCost + heuristic;
+                    //将此邻居节点压入目标路径队列
                     frontier.Enqueue(neighbour, priority);
                 }
             }
         }
 
-        List<T> path = new List<T>();
+        List<HexCell> path = new List<HexCell>();
         if (!cameFrom.ContainsKey(destinationNode))
-            return path;
-
+        {
+            //未找到路径
+            if (findPathCallBack != null)
+            {
+                findPathCallBack.Invoke(path);
+            }
+            yield break;
+        }
         path.Add(destinationNode);
         var temp = destinationNode;
-
         while (!cameFrom[temp].Equals(originNode))
         {
             var currentPathElement = cameFrom[temp];
             path.Add(currentPathElement);
-
             temp = currentPathElement;
         }
-
-        return path;
+        if (findPathCallBack != null)
+        {
+            findPathCallBack.Invoke(path);
+        }
     }
-    private int Heuristic<T>(T a, T b) where T : IGraphNode
+    private int Heuristic(HexCell a, HexCell b)
     {
         return a.GetDistance(b);
 	}
-
-	public List<long> FindPath(Dictionary<long, List<long>> edges, long originNode, long destinationNode)
-	{
-		IPriorityQueue<long> frontier = new HeapPriorityQueue<long>();
-		frontier.Enqueue(originNode, 0);
-
-		Dictionary<long, long> cameFrom = new Dictionary<long, long>();
-		cameFrom.Add(originNode, default(long));
-		Dictionary<long, int> costSoFar = new Dictionary<long, int>();
-		costSoFar.Add(originNode, 0);
-
-		while (frontier.Count != 0)
-		{
-			var current = frontier.Dequeue();
-			if (current.Equals(destinationNode)) break;
-
-			var neighbours = GetNeigbours(edges, current);
-			foreach (var neighbour in neighbours)
-			{
-				var newCost = costSoFar[current] + 1;
-				if (!costSoFar.ContainsKey(neighbour) || newCost < costSoFar[neighbour])
-				{
-					costSoFar[neighbour] = newCost;
-					cameFrom[neighbour] = current;
-					var priority = newCost + Heuristic(destinationNode, neighbour);
-					frontier.Enqueue(neighbour, priority);
-				}
-			}
-		}
-
-		List<long> path = new List<long>();
-		if (!cameFrom.ContainsKey(destinationNode))
-			return path;
-
-		path.Add(destinationNode);
-		var temp = destinationNode;
-
-		while (!cameFrom[temp].Equals(originNode))
-		{
-			var currentPathElement = cameFrom[temp];
-			path.Add(currentPathElement);
-
-			temp = currentPathElement;
-		}
-
-		return path;
-	}
-
-	protected List<long> GetNeigbours(Dictionary<long, List<long>> edges, long node)
-	{
-		return edges [node];
-	}
-
-	private int Heuristic(long a, long b)
-	{
-		return Distances[a][b];
-	}
+    protected List<HexCell> GetNeigbours(Dictionary<HexCell, Dictionary<HexCell, int>> edges, HexCell node)
+    {
+        if (!edges.ContainsKey(node))
+        {
+            return new List<HexCell>();
+        }
+        return edges[node].Keys.ToList();
+    }
 }
 
 

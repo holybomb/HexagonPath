@@ -5,7 +5,7 @@ using System;
 /// <summary>
 /// Implementation of hexagonal cell.
 /// </summary>
-public class HexCell : MonoBehaviour,IGraphNode
+public class HexCell : MonoBehaviour
 {
     public bool isSelected = false;
     [HideInInspector]
@@ -21,13 +21,12 @@ public class HexCell : MonoBehaviour,IGraphNode
     public int MovementCost;
 
     public event EventHandler CellClicked;
-    public event EventHandler CellUp;
+//    public event EventHandler CellUp;
 
-    private bool IsRotateNeighbor;
     /// <summary>
-    /// Cube coordinates is another system of coordinates that makes calculation on hex grids easier.
+    /// 立方体坐标
     /// </summary>
-    protected Vector3 CubeCoord
+    public Vector3 CubeCoord
     {
         get
         {
@@ -44,7 +43,11 @@ public class HexCell : MonoBehaviour,IGraphNode
             return ret;
         }
     }
-
+    /// <summary>
+    /// 立方体坐标转为偏移坐标
+    /// </summary>
+    /// <returns>The to offset coords.</returns>
+    /// <param name="cubeCoords">Cube coords.</param>
     protected Vector2 CubeToOffsetCoords(Vector3 cubeCoords)
     {
         Vector2 ret = new Vector2();
@@ -64,6 +67,9 @@ public class HexCell : MonoBehaviour,IGraphNode
 
         return new Vector3(1.0f, 1.0f, 1f);// * 1.1f;
     }
+    /// <summary>
+    /// 六个方向的立方体坐标偏移
+    /// </summary>
     protected static readonly Vector3[] _directions =  {
         new Vector3(+1, -1, 0), new Vector3(+1, 0, -1), new Vector3(0, +1, -1),
         new Vector3(-1, +1, 0), new Vector3(-1, 0, +1), new Vector3(0, -1, +1)};
@@ -77,24 +83,16 @@ public class HexCell : MonoBehaviour,IGraphNode
         return distance;
     }
 
-    public int GetDistance(IGraphNode other)
-    {
-        return GetDistance(other as HexCell);
-    }
-
     //Distance is given using Manhattan Norm.
     public List<HexCell> GetNeighbours(List<HexCell> cells)
     {
         List<HexCell> ret = new List<HexCell>();
 
-        if (!IsRotateNeighbor)
+        for (var i = 0; i < _directions.Length / 2; i++)
         {
-            for (var i = 0; i < _directions.Length / 2; i++)
-            {
-                var neighbour = cells.Find(c => c.OffsetCoord == CubeToOffsetCoords(CubeCoord + _directions[i]));
-                if (neighbour == null) continue;
-                ret.Add(neighbour);
-            }
+            var neighbour = cells.Find(c => c.OffsetCoord == CubeToOffsetCoords(CubeCoord + _directions[i]));
+            if (neighbour == null) continue;
+            ret.Add(neighbour);
         }
 
         for (var i = _directions.Length / 2; i < _directions.Length; i++)
@@ -103,24 +101,9 @@ public class HexCell : MonoBehaviour,IGraphNode
             if (neighbour == null) continue;
             ret.Add(neighbour);
         }
-
-        if (IsRotateNeighbor)
-        {
-            for (var i = 0; i < _directions.Length / 2; i++)
-            {
-                var neighbour = cells.Find(c => c.OffsetCoord == CubeToOffsetCoords(CubeCoord + _directions[i]));
-                if (neighbour == null) continue;
-                ret.Add(neighbour);
-            }
-        }
         return ret;
     }//Each square cell has six neighbors, which positions on grid relative to the cell are stored in _directions constant.
 
-    public HexCell GetNextCellInLine (HexCell neighbor, List<HexCell> cells, int step)
-	{
-        var dir = (CubeCoord - neighbor.CubeCoord) / GetDistance(neighbor);
-		return cells.Find(c => c.OffsetCoord == CubeToOffsetCoords(neighbor.CubeCoord - dir * step));
-	}
     public Color SelectColor = Color.green;
     public Color UnSelectColor = Color.white;
     public Color pathColor = Color.yellow;

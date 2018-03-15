@@ -50,40 +50,29 @@ public class MapGrid : MonoBehaviour
 		//设置材质  
 		lineRenderer.material = new Material(Shader.Find("Mobile/Particles/Alpha Blended"));  
 		//设置颜色  
-		lineRenderer.SetColors(Color.red, Color.blue);  
+        lineRenderer.startColor = Color.red;
+        lineRenderer.endColor = Color.blue;
 		//设置宽度  
-		lineRenderer.SetWidth(0.1f, 0.1f); 
+        lineRenderer.startWidth =0.1f;
+        lineRenderer.endWidth = 0.1f; 
         #if UNITY_5
         lineRenderer.numPositions = 0;
         #else
 		lineRenderer.positionCount = 0;
         #endif
-		if (AStarPathfinding.Distances == null)
-		{
-			AStarPathfinding.Distances = new Dictionary<long, Dictionary<long, int>>();
-			Cells.ForEach(c =>
-				{
-					var dict = new Dictionary<long, int>();
-					Cells.ForEach(c1 =>
-						{
-							dict[c1.SingleOffset] = c.GetDistance(c1);
-						});
-					AStarPathfinding.Distances[c.SingleOffset] = dict;
-				});
-		}
     }
     protected virtual Dictionary<HexCell, Dictionary<HexCell, int>> GetGraphEdges(List<HexCell> cells)
     {
-        Dictionary<HexCell, Dictionary<HexCell, int>> ret = new Dictionary<HexCell, Dictionary<HexCell, int>>();
-        foreach (var cell in cells)
-        {
-                ret[cell] = new Dictionary<HexCell, int>();
-                var neighbors = cell.GetNeighbours(cells);
-                foreach (var neighbour in neighbors)
-                {
-                    ret[cell][neighbour] = neighbour.MovementCost;
-                }
-        }
+         Dictionary<HexCell, Dictionary<HexCell, int>> ret = new Dictionary<HexCell, Dictionary<HexCell, int>>();
+         foreach (var cell in cells)
+         {
+                 ret[cell] = new Dictionary<HexCell, int>();
+                 var neighbors = cell.GetNeighbours(cells);
+                 foreach (var neighbour in neighbors)
+                 {
+                     ret[cell][neighbour] = neighbour.MovementCost;
+                 }
+         }
         return ret;
     }
 	/// <summary>
@@ -100,17 +89,17 @@ public class MapGrid : MonoBehaviour
 			endCell.UnMark ();
 		endCell = null;
 		if (lineRenderer)
-            #if UNITY_5
+        #if UNITY_5
             lineRenderer.numPositions = 0;
-            #else
+        #else
 			lineRenderer.positionCount = 0;
-            #endif
+        #endif
 	}
     bool isSelectStart = true;
     HexCell startCell,endCell;
     List<HexCell> path;
     bool isUpdatePath;
-    private static IPathfinding _pathfinder = new AStarPathfinding();
+    private static AStarPathfinding _pathfinder = new AStarPathfinding();
 
     void ClearPath()
     {
@@ -120,22 +109,23 @@ public class MapGrid : MonoBehaviour
 			path.Clear ();
         }
     }
-
-    // Update is called once per frame
     void Update()
     {
         if (startCell && endCell && startCell != endCell && isUpdatePath)
         {
-            path = _pathfinder.FindPath<HexCell>(GetGraphEdges(Cells), startCell, endCell);
-            if (path != null && path.Count > 0)
-            {
-                path.ForEach(c =>
+            StartCoroutine(_pathfinder.FindPath(GetGraphEdges(Cells), startCell, endCell, ((p) =>
                     {
-                        if (c != startCell && c != endCell)
-                            c.MarkAsPath();
-                    });
-            }
-			DrawPath ();
+                        path = p;
+                        if (path != null && path.Count > 0)
+                        {
+                            path.ForEach(c =>
+                                {
+                                    if (c != startCell && c != endCell)
+                                        c.MarkAsPath();
+                                });
+                        }
+                        DrawPath();
+                    })));
             isUpdatePath = false;
         }
     }

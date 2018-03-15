@@ -1,25 +1,45 @@
 ﻿using System.Collections.Generic;
+using System;
 
-/// <summary>
-/// Implementation of priority queue based on heap. Should be fast.
-/// </summary>
-class HeapPriorityQueue<T> : IPriorityQueue<T>
+
+class PriorityQueueNode : IComparable
 {
-    private List<PriorityQueueNode<T>> _queue;
+    public HexCell Item { get; private set; }
+    public float Priority { get; private set; }
+
+    public PriorityQueueNode(HexCell item, float priority)
+    {
+        Item = item;
+        Priority = priority;
+    }
+
+    public int CompareTo(object obj)
+    {
+        return Priority.CompareTo((obj as PriorityQueueNode).Priority);
+    }
+}
+
+class HeapPriorityQueue
+{
+    private List<PriorityQueueNode> _queue;
     
     public HeapPriorityQueue()
     {
-        _queue = new List<PriorityQueueNode<T>>();
+        _queue = new List<PriorityQueueNode>();
     }
 
     public int Count
     {
         get { return _queue.Count; }
     }
-
-    public void Enqueue(T item, int priority)
+    /// <summary>
+    /// 压入队列
+    /// </summary>
+    /// <param name="item">Item.</param>
+    /// <param name="priority">Priority.</param>
+    public void Enqueue(HexCell item, int priority)
     {
-        _queue.Add(new PriorityQueueNode<T>(item, priority));
+        _queue.Add(new PriorityQueueNode(item, priority));
         int ci = _queue.Count - 1;
         while (ci > 0)
         {
@@ -32,14 +52,23 @@ class HeapPriorityQueue<T> : IPriorityQueue<T>
             ci = pi;
         }
     }
-    public T Dequeue()
+    public List<HexCell> getQueueCell()
+    {
+        var result = new List<HexCell>();
+        _queue.ForEach(c => result.Add(c.Item));
+        return result;
+    }
+    /// <summary>
+    /// 取出队列
+    /// </summary>
+    public HexCell Dequeue()
     {
         int li = _queue.Count - 1;
         var frontItem = _queue[0];
         _queue[0] = _queue[li];
         _queue.RemoveAt(li);
 
-        --li;
+        li--;
         int pi = 0;
         while (true)
         {
@@ -48,8 +77,11 @@ class HeapPriorityQueue<T> : IPriorityQueue<T>
             int rc = ci + 1;
             if (rc <= li && _queue[rc].CompareTo(_queue[ci]) < 0)
                 ci = rc;
-            if (_queue[pi].CompareTo(_queue[ci]) <= 0) break;
-            var tmp = _queue[pi]; _queue[pi] = _queue[ci]; _queue[ci] = tmp;
+            if (_queue[pi].CompareTo(_queue[ci]) <= 0) 
+                break;
+            var tmp = _queue[pi];
+            _queue[pi] = _queue[ci]; 
+            _queue[ci] = tmp;
             pi = ci;
         }
         return frontItem.Item;

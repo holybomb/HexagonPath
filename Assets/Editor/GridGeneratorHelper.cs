@@ -2,19 +2,19 @@
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(ICellGridGenerator), true)]
+[CustomEditor(typeof(HexagonalHexGridGenerator), true)]
 public class GridGeneratorHelper : Editor
 {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        ICellGridGenerator gridGenerator = (ICellGridGenerator)target;
+        HexagonalHexGridGenerator gridGenerator = (HexagonalHexGridGenerator)target;
   
-        if (GUILayout.Button("Generate Grid"))
+        if (GUILayout.Button("生成地图"))
         {
             gridGenerator.GenerateGrid();
         }
-        if (GUILayout.Button("Clear Grid"))
+        if (GUILayout.Button("清空地图"))
         {
             var children = new List<GameObject>();
             foreach(Transform cell in gridGenerator.CellsParent)
@@ -24,10 +24,7 @@ public class GridGeneratorHelper : Editor
 
             children.ForEach(c => DestroyImmediate(c));
         }
-		if (GUILayout.Button("Update Grid")) {
-			gridGenerator.UpdateGrid();
-        }
-        if (GUILayout.Button("Toggle Cell Vector")) {
+        if (GUILayout.Button("显示坐标")) {
             gridGenerator.ToggleCellPos();
         }
     }
