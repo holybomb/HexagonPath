@@ -22,10 +22,10 @@ public class AStarPathfinding
         {
             var current = frontier.Dequeue();
 //            //寻路到目标点跳出
-//            if (current.Equals(destinationNode))
-//            {
-//                break;
-//            }
+            if (current.Equals(destinationNode))
+            {
+                break;
+            }
             var neighbours = GetNeigbours(edges, current);
             neighbours = neighbours.OrderBy(c => c.GetDistance(destinationNode)).ToList();
             if (neighbours.Contains(destinationNode))
@@ -41,7 +41,7 @@ public class AStarPathfinding
                     //根据到目标点的坐标距离设置启发值
                     var heuristicDes = Heuristic(destinationNode, neighbour);
                     var heuristicOrg = Heuristic(neighbour,originNode);
-                    var priority = newCost + heuristicDes;// + (heuristicOrg - midDis);
+                    var priority = newCost + heuristicDes+ heuristicOrg;
                     //将此邻居节点压入目标路径队列
                     frontier.Enqueue(neighbour, priority);
                 }
@@ -58,16 +58,16 @@ public class AStarPathfinding
             }
             yield break;
         }
-        var frontCells = frontier.getQueueCell();
-        foreach (var cell in frontCells)
-        {
-            cell.SetColor(Color.red);
-            yield return new WaitForSeconds(0.5f);
-        }
-        foreach (var cell in frontCells)
-        {
-            cell.UnMark();
-        }
+//        var frontCells = frontier.getQueueCell();
+//        foreach (var cell in frontCells)
+//        {
+//            cell.SetColor(Color.red);
+//            yield return new WaitForSeconds(0.5f);
+//        }
+//        foreach (var cell in frontCells)
+//        {
+//            cell.UnMark();
+//        }
         path.Add(destinationNode);
         var temp = destinationNode;
         while (!cameFrom[temp].Equals(originNode))

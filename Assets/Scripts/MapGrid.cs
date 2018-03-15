@@ -7,11 +7,11 @@ public class MapGrid : MonoBehaviour
     public GameObject cellRoot;
     [HideInInspector]
     public List<HexCell> Cells = new List<HexCell>();
-    // Use this for initialization
     void Awake()
     {
         if (cellRoot)
         {
+			//初始化格子信息
             Cells.AddRange(cellRoot.transform.GetComponentsInChildren<HexCell>());
             Cells.ForEach(c =>
                 {
