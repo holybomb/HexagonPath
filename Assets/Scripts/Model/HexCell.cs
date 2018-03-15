@@ -62,7 +62,7 @@ public class HexCell : MonoBehaviour,IGraphNode
         if (renderer != null)
             return renderer.bounds.size * 1.03f;
 
-        return new Vector3(2.0f, 1.0f, 1.75f) * 1.1f;
+        return new Vector3(1.0f, 1.0f, 1f);// * 1.1f;
     }
     protected static readonly Vector3[] _directions =  {
         new Vector3(+1, -1, 0), new Vector3(+1, 0, -1), new Vector3(0, +1, -1),
@@ -139,13 +139,10 @@ public class HexCell : MonoBehaviour,IGraphNode
     }
     public void SetColor(Color color)
     {
-        var renders = transform.GetComponentsInChildren<Renderer>();
-        foreach (var render in renders)
+        var render = transform.GetComponent<Renderer>();
+        if (render && render.material)
         {
-            if (render && render.material)
-            {
-                render.material.SetColor("_Color", color);
-            }
+            render.material.SetColor("_Color", color);
         }
     }
     public void OnMouseDown()

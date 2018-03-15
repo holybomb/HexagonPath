@@ -52,9 +52,12 @@ public class MapGrid : MonoBehaviour
 		//设置颜色  
 		lineRenderer.SetColors(Color.red, Color.blue);  
 		//设置宽度  
-		lineRenderer.SetWidth(0.1f, 0.1f);  
+		lineRenderer.SetWidth(0.1f, 0.1f); 
+        #if UNITY_5
+        lineRenderer.numPositions = 0;
+        #else
 		lineRenderer.positionCount = 0;
-
+        #endif
 		if (AStarPathfinding.Distances == null)
 		{
 			AStarPathfinding.Distances = new Dictionary<long, Dictionary<long, int>>();
@@ -97,7 +100,11 @@ public class MapGrid : MonoBehaviour
 			endCell.UnMark ();
 		endCell = null;
 		if (lineRenderer)
+            #if UNITY_5
+            lineRenderer.numPositions = 0;
+            #else
 			lineRenderer.positionCount = 0;
+            #endif
 	}
     bool isSelectStart = true;
     HexCell startCell,endCell;
@@ -137,7 +144,11 @@ public class MapGrid : MonoBehaviour
 	{
 		if (lineRenderer && path != null) {
 			int LengthOfLineRenderer = path.Count+1;
+            #if UNITY_5
+            lineRenderer.numPositions = LengthOfLineRenderer;
+            #else
 			lineRenderer.positionCount=LengthOfLineRenderer;
+            #endif
 			int index = LengthOfLineRenderer;
 			path.ForEach (p => {
 				lineRenderer.SetPosition(--index, p.transform.position+new Vector3(0.0f,0.5f,0.0f));  
