@@ -154,31 +154,31 @@ public class MapGrid : MonoBehaviour
                 path.Add(startCell);
                 for (int i = 0; i < LengthOfLineRenderer; i++)
                 {
-//                    var p = path[i];
+					var p = path[LengthOfLineRenderer-i-1];
                     float lerpDt = (float)(i) / (LengthOfLineRenderer-1);
+					lineRenderer.positionCount++;
                     var pos = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
-                    var info = "Start Check:"+pos;
-                    path.ForEach(c =>
-                        {
-                            var dis = Vector3.Distance(pos,c.transform.position);
-                            info +=("To "+c.CubeCoord+" dis:"+dis +"\n");
-                        });
-                    Debug.Log(info);
-//                    if (Vector3.Distance(pos, p.transform.position) > 1)
-//                    {
-//                        for (float t = 0; t < 1.0f; t += 0.01f)
+//                    var info = "Start Check:"+pos;
+//                    path.ForEach(c =>
 //                        {
-//                            var temp = Vector3.Lerp(pos, p.transform.position, t);
-//                            if (Vector3.Distance(temp, p.transform.position) <= 1)
-//                            {
-//                                pos = temp;
-//                                break;
-//                            }
-//                        }
-//                    }
+//                            var dis = Vector3.Distance(pos,c.transform.position);
+//                            info +=("To "+c.CubeCoord+" dis:"+dis +"\n");
+//                        });
+//                    Debug.Log(info);
+                    if (Vector3.Distance(pos, p.transform.position) > 0.25)
+                    {
+                        for (float t = 0; t < 1.0f; t += 0.1f)
+                        {
+                            var temp = Vector3.Lerp(pos, p.transform.position, t);
+							if (Vector3.Distance(temp, p.transform.position) <= 0.25)
+                            {
+                                pos = temp;
+                                break;
+                            }
+                        }
+                    }
+					lineRenderer.SetPosition(i, pos - new Vector3(0.0f, 0.5f, 0.0f));
 //                    p.y = 0;
-                    lineRenderer.numPositions++;
-                    lineRenderer.SetPosition(i, pos - new Vector3(0.0f, 0.5f, 0.0f));
 //                    yield return new WaitForSeconds(0.3f);
                 }
             }
