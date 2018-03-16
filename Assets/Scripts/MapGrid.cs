@@ -46,6 +46,7 @@ public class MapGrid : MonoBehaviour
                 });
         }
 		var lineObject = new GameObject ();
+        lineObject.name = "PathLine";
 		lineObject.transform.SetParent (cellRoot.transform);
 		lineRenderer = lineObject.AddComponent<LineRenderer>();  
 		//设置材质  
@@ -130,54 +131,47 @@ public class MapGrid : MonoBehaviour
             isUpdatePath = false;
         }
     }
-    bool isDrawLineThroughCenter = false;
+    public bool isDrawLineThroughCenter = false;
 	LineRenderer lineRenderer;
+    /// <summary>
+    /// 绘制路径
+    /// </summary>
+    /// <returns>The path.</returns>
     private IEnumerator DrawPath()
 	{
 		if (lineRenderer && path != null) {
 			int LengthOfLineRenderer = path.Count+1;
-            if (isDrawLineThroughCenter)
+
+            path.Add(startCell);
+            for (int i = 0; i < LengthOfLineRenderer; i++)
             {
                 #if UNITY_5
-                lineRenderer.numPositions = LengthOfLineRenderer;
+                lineRenderer.numPositions++;
                 #else
-                lineRenderer.positionCount=LengthOfLineRenderer;
+                lineRenderer.positionCount++;
                 #endif
-                int index = LengthOfLineRenderer;
-                path.ForEach(p =>
-                    {
-                        lineRenderer.SetPosition(--index, p.transform.position + new Vector3(0.0f, 0.5f, 0.0f));  
-                    });
-                lineRenderer.SetPosition(--index, startCell.transform.position + new Vector3(0.0f, 0.5f, 0.0f));  
-            }
-            else
-            {
-                path.Add(startCell);
-                for (int i = 0; i < LengthOfLineRenderer; i++)
+				var p = path[LengthOfLineRenderer-i-1];
+                var pos = p.transform.position;
+                if (!isDrawLineThroughCenter)
                 {
-					var p = path[LengthOfLineRenderer-i-1];
-                    float lerpDt = (float)(i) / (LengthOfLineRenderer-1);
-					#if UNITY_5
-					lineRenderer.numPositions++;
-					#else
-					lineRenderer.positionCount++;
-					#endif
-                    var pos = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
+                    float lerpDt = (float)(i) / (LengthOfLineRenderer - 1);
+
+                    pos = Vector3.Lerp(startCell.transform.position, endCell.transform.position, lerpDt);
                     if (Vector3.Distance(pos, p.transform.position) > 0.25)
                     {
                         for (float t = 0; t < 1.0f; t += 0.1f)
                         {
                             var temp = Vector3.Lerp(pos, p.transform.position, t);
-							if (Vector3.Distance(temp, p.transform.position) <= 0.25)
+                            if (Vector3.Distance(temp, p.transform.position) <= 0.25)
                             {
                                 pos = temp;
                                 break;
                             }
                         }
                     }
-					lineRenderer.SetPosition(i, pos - new Vector3(0.0f, 0.5f, 0.0f));
-
                 }
+				lineRenderer.SetPosition(i, pos);
+                yield return new WaitForSeconds(0.1f);
             }
 		}
         yield return 0;
